@@ -1,0 +1,779 @@
+{
+  "info": {
+    "name": "GainHQ Backend API",
+    "description": "Complete GraphQL API for GainHQ Backend with authentication, CRUD operations, and analytics",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:4000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Sign Up",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation SignUp($input: SignUpInput!) {\n  signUp(input: $input) {\n    token\n    user {\n      id\n      email\n      role\n    }\n  }\n}",
+                "variables": "{\n  \"input\": {\n    \"email\": \"newstudent@example.com\",\n    \"password\": \"password123\",\n    \"name\": \"John Doe\",\n    \"instituteId\": \"<paste-institute-id-here>\"\n  }\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            },
+            "description": "Create a new student account. After signing up, copy the token from the response and set it in the collection variable 'token'."
+          }
+        },
+        {
+          "name": "Sign In",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation SignIn($input: SignInInput!) {\n  signIn(input: $input) {\n    token\n    user {\n      id\n      email\n      role\n    }\n  }\n}",
+                "variables": "{\n  \"input\": {\n    \"email\": \"student0@example.com\",\n    \"password\": \"password123\"\n  }\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            },
+            "description": "Sign in with existing credentials. Use 'student0@example.com' to 'student99999@example.com' with password 'password123'. Copy the token and set it in the collection variable."
+          }
+        },
+        {
+          "name": "Get Current User (Me)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "description": "JWT token from sign in/sign up"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query Me {\n  me {\n    id\n    email\n    role\n    student {\n      id\n      name\n      email\n      institute {\n        name\n        location\n      }\n    }\n  }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            },
+            "description": "Get currently authenticated user details"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Institutes",
+      "item": [
+        {
+          "name": "List Institutes",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query Institutes($limit: Int, $offset: Int) {\n  institutes(limit: $limit, offset: $offset) {\n    items {\n      id\n      name\n      location\n      createdAt\n    }\n    totalCount\n    hasMore\n  }\n}",
+                "variables": "{\n  \"limit\": 10,\n  \"offset\": 0\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            }
+          }
+        },
+        {
+          "name": "Get Institute by ID",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query Institute($id: ID!) {\n  institute(id: $id) {\n    id\n    name\n    location\n    students {\n      id\n      name\n      email\n    }\n    createdAt\n    updatedAt\n  }\n}",
+                "variables": "{\n  \"id\": \"<paste-institute-id-here>\"\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            }
+          }
+        },
+        {
+          "name": "Create Institute",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation CreateInstitute($input: CreateInstituteInput!) {\n  createInstitute(input: $input) {\n    id\n    name\n    location\n    createdAt\n  }\n}",
+                "variables": "{\n  \"input\": {\n    \"name\": \"MIT\",\n    \"location\": \"Cambridge, MA\"\n  }\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            }
+          }
+        },
+        {
+          "name": "Update Institute",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation UpdateInstitute($id: ID!, $input: UpdateInstituteInput!) {\n  updateInstitute(id: $id, input: $input) {\n    id\n    name\n    location\n    updatedAt\n  }\n}",
+                "variables": "{\n  \"id\": \"<paste-institute-id-here>\",\n  \"input\": {\n    \"name\": \"Massachusetts Institute of Technology\",\n    \"location\": \"Cambridge, Massachusetts\"\n  }\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            }
+          }
+        },
+        {
+          "name": "Delete Institute",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DeleteInstitute($id: ID!) {\n  deleteInstitute(id: $id)\n}",
+                "variables": "{\n  \"id\": \"<paste-institute-id-here>\"\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Students",
+      "item": [
+        {
+          "name": "List Students",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query Students($limit: Int, $offset: Int) {\n  students(limit: $limit, offset: $offset) {\n    items {\n      id\n      name\n      email\n      institute {\n        name\n        location\n      }\n    }\n    totalCount\n    hasMore\n  }\n}",
+                "variables": "{\n  \"limit\": 20,\n  \"offset\": 0\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            }
+          }
+        },
+        {
+          "name": "Get Student by ID",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query Student($id: ID!) {\n  student(id: $id) {\n    id\n    name\n    email\n    institute {\n      id\n      name\n      location\n    }\n    user {\n      email\n      role\n    }\n    results {\n      course {\n        title\n        code\n      }\n      score\n      grade\n      year\n    }\n  }\n}",
+                "variables": "{\n  \"id\": \"<paste-student-id-here>\"\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            }
+          }
+        },
+        {
+          "name": "Update Student",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation UpdateStudent($id: ID!, $input: UpdateStudentInput!) {\n  updateStudent(id: $id, input: $input) {\n    id\n    name\n    email\n    updatedAt\n  }\n}",
+                "variables": "{\n  \"id\": \"<paste-student-id-here>\",\n  \"input\": {\n    \"name\": \"Jane Smith\",\n    \"email\": \"jane.smith@example.com\"\n  }\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            }
+          }
+        },
+        {
+          "name": "Delete Student",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DeleteStudent($id: ID!) {\n  deleteStudent(id: $id)\n}",
+                "variables": "{\n  \"id\": \"<paste-student-id-here>\"\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Courses",
+      "item": [
+        {
+          "name": "List Courses",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query Courses($limit: Int, $offset: Int) {\n  courses(limit: $limit, offset: $offset) {\n    items {\n      id\n      title\n      code\n      credits\n    }\n    totalCount\n    hasMore\n  }\n}",
+                "variables": "{\n  \"limit\": 20,\n  \"offset\": 0\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            }
+          }
+        },
+        {
+          "name": "Get Course by ID",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query Course($id: ID!) {\n  course(id: $id) {\n    id\n    title\n    code\n    credits\n    results {\n      student {\n        name\n      }\n      score\n      grade\n      year\n    }\n  }\n}",
+                "variables": "{\n  \"id\": \"<paste-course-id-here>\"\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            }
+          }
+        },
+        {
+          "name": "Create Course",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation CreateCourse($input: CreateCourseInput!) {\n  createCourse(input: $input) {\n    id\n    title\n    code\n    credits\n    createdAt\n  }\n}",
+                "variables": "{\n  \"input\": {\n    \"title\": \"Advanced Web Development\",\n    \"code\": \"CS401\",\n    \"credits\": 3\n  }\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            }
+          }
+        },
+        {
+          "name": "Update Course",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation UpdateCourse($id: ID!, $input: UpdateCourseInput!) {\n  updateCourse(id: $id, input: $input) {\n    id\n    title\n    code\n    credits\n    updatedAt\n  }\n}",
+                "variables": "{\n  \"id\": \"<paste-course-id-here>\",\n  \"input\": {\n    \"title\": \"Web Development Fundamentals\",\n    \"credits\": 4\n  }\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            }
+          }
+        },
+        {
+          "name": "Delete Course",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DeleteCourse($id: ID!) {\n  deleteCourse(id: $id)\n}",
+                "variables": "{\n  \"id\": \"<paste-course-id-here>\"\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Results",
+      "item": [
+        {
+          "name": "List Results",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query Results($limit: Int, $offset: Int) {\n  results(limit: $limit, offset: $offset) {\n    items {\n      id\n      student {\n        name\n      }\n      course {\n        title\n        code\n      }\n      score\n      grade\n      year\n    }\n    totalCount\n    hasMore\n  }\n}",
+                "variables": "{\n  \"limit\": 20,\n  \"offset\": 0\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            }
+          }
+        },
+        {
+          "name": "Get Result by ID",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query Result($id: ID!) {\n  result(id: $id) {\n    id\n    student {\n      name\n      email\n      institute {\n        name\n      }\n    }\n    course {\n      title\n      code\n      credits\n    }\n    score\n    grade\n    year\n    createdAt\n  }\n}",
+                "variables": "{\n  \"id\": \"<paste-result-id-here>\"\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            }
+          }
+        },
+        {
+          "name": "Create Result",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation CreateResult($input: CreateResultInput!) {\n  createResult(input: $input) {\n    id\n    student {\n      name\n    }\n    course {\n      title\n    }\n    score\n    grade\n    year\n    createdAt\n  }\n}",
+                "variables": "{\n  \"input\": {\n    \"studentId\": \"<paste-student-id-here>\",\n    \"courseId\": \"<paste-course-id-here>\",\n    \"score\": 92.5,\n    \"grade\": \"A\",\n    \"year\": 2024\n  }\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            }
+          }
+        },
+        {
+          "name": "Update Result",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation UpdateResult($id: ID!, $input: UpdateResultInput!) {\n  updateResult(id: $id, input: $input) {\n    id\n    score\n    grade\n    year\n    updatedAt\n  }\n}",
+                "variables": "{\n  \"id\": \"<paste-result-id-here>\",\n  \"input\": {\n    \"score\": 95.0,\n    \"grade\": \"A+\"\n  }\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            }
+          }
+        },
+        {
+          "name": "Delete Result",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DeleteResult($id: ID!) {\n  deleteResult(id: $id)\n}",
+                "variables": "{\n  \"id\": \"<paste-result-id-here>\"\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Analytics",
+      "item": [
+        {
+          "name": "All Data with Relationships",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query AllData {\n  allData {\n    id\n    name\n    location\n    students {\n      id\n      name\n      email\n      results {\n        course {\n          title\n          code\n        }\n        score\n        grade\n        year\n      }\n    }\n  }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            },
+            "description": "Get all institutes with complete student and result relationships"
+          }
+        },
+        {
+          "name": "Results Per Institute",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query ResultsPerInstitute($instituteId: ID) {\n  resultsPerInstitute(instituteId: $instituteId) {\n    institute {\n      id\n      name\n      location\n    }\n    results {\n      student {\n        name\n      }\n      course {\n        title\n      }\n      score\n      grade\n      year\n    }\n    averageScore\n    totalStudents\n  }\n}",
+                "variables": "{\n  \"instituteId\": null\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            },
+            "description": "Get aggregated results per institute. Leave instituteId as null to get all institutes, or provide a specific ID."
+          }
+        },
+        {
+          "name": "Top Courses by Year",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query TopCourses($year: Int!, $limit: Int) {\n  topCourses(year: $year, limit: $limit) {\n    course {\n      id\n      title\n      code\n      credits\n    }\n    enrollmentCount\n    year\n  }\n}",
+                "variables": "{\n  \"year\": 2024,\n  \"limit\": 10\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            },
+            "description": "Get top courses by enrollment for a specific year"
+          }
+        },
+        {
+          "name": "Top Students Globally",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query TopStudents($limit: Int) {\n  topStudents(limit: $limit) {\n    student {\n      id\n      name\n      email\n      institute {\n        name\n        location\n      }\n    }\n    totalScore\n    averageScore\n    resultCount\n  }\n}",
+                "variables": "{\n  \"limit\": 100\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": ["{{baseUrl}}"],
+              "path": ["graphql"]
+            },
+            "description": "Get top students ranked by cumulative score across all courses"
+          }
+        }
+      ]
+    }
+  ]
+}
